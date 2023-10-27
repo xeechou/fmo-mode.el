@@ -1,0 +1,12 @@
+* fmo-mode.el
+The minor mode to run formatter only on changed lines instead of whole buffer, this is convenient for large legacy code base that have not conform to formatter yet.
+
+* How it works
+it relies on [[https://www.gnu.org/software/diffutils/manual/html_node/Hunks.html][Diff Hunks]] to track the changed region of the file, we get a list of change regions. Then we iterative-ly apply ~format-all-region~ on the hunks while *maintaining* a ~offset~, this offset tracks the size of changes of ~format-all-region~ for each iteration. Then we shift the _hunk_ accordingly. Note that we apply from top to bottom.
+
+* TODO Next steps
+- [ ] I think it is probably easier if we apply ~fmo-format-lines~ bottom-up, that we do not even need to keep track of the ~offset~ anymore.
+- [ ] resort to use diff directly referring [[https://emacs.stackexchange.com/questions/27382/diff-of-two-buffers-without-creating-temporary-files][this-article]].
+
+* License
+GPL-v3
