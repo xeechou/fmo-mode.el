@@ -69,16 +69,21 @@
   "get last line number of the buffer"
   (+ 1 (fmo--buffer-total-lines)))
 
+(defun fmo--goto-line (ln)
+  "goto line using forward line"
+  (goto-char (point-min))
+  (forward-line (1- ln)))
+
 (defun fmo--pos-bol-at (ln)
   "goto line at ln and return pos-bol"
   (save-excursion
-    (goto-line ln)
+    (fmo--goto-line ln)
     (pos-bol)))
 
 (defun fmo--pos-eol-at (ln)
   "goto line at ln and return pos-eol"
   (save-excursion
-    (goto-line ln)
+    (fmo--goto-line ln)
     (pos-eol)))
 
 (defun fmo--pos-get-line (pos)
@@ -113,9 +118,6 @@ region, returns a pair of position"
 	 (pos-end (cdr pos-region)))
     (cons (fmo--pos-get-line (+ offset pos-beg))
 	  (fmo--pos-get-line (+ offset pos-end)))))
-
-(defun fmo--buffer-content-simple ()
-  (buffer-substring-no-properties (point-min) (point-max)))
 
 ;;TODO rely on diff instead of difflib
 (defun fmo--buffer-diff-file ()
