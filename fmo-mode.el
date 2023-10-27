@@ -2,7 +2,7 @@
 
 ;; Author: Xichen Zhou <sichem.zh@gmail.com>
 ;; Copyright (C) 2023, Xichen Zhou, all rights reversed.
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Package-Requires: ((emacs "24.4") (difflib "0.3.7") (format-all "0.5.0"))
 ;; Keywords: languages util
 
