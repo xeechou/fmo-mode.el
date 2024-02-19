@@ -1,5 +1,17 @@
 * fmo-mode.el
-The minor mode to run formatter only on changed lines instead of whole buffer, this is convenient for large legacy code base that have not conform to formatter yet.
+The minor mode to run [[https://github.com/lassik/emacs-format-all-the-code][format-all]] only on changed lines instead of whole buffer, this is convenient for large legacy code base that have not conform to formatter yet.
+
+* Usage
+simply add ~fmo-mode~ to your desired major mode or globally in ~prog-mode~.
+
+#+begin_src emacs-lisp
+(use-package fmo-mode
+  :vc (:fetcher github :repo "xeechou/fmo-mode.el")
+  :hook ((prog-mode . fmo-mode)
+         ;;fmo-mode requires give formatter to format-all to work.
+ 	   (prog-mode . format-all-ensure-formatter)))
+#+end_src
+
 
 * How it works
 it relies on [[https://www.gnu.org/software/diffutils/manual/html_node/Hunks.html][Diff Hunks]] to track the changed region of the file, we get a list of change regions. Then we iterative-ly apply ~format-all-region~ on the hunks while *maintaining* a ~offset~, this offset tracks the size of changes of ~format-all-region~ for each iteration. Then we shift the _hunk_ accordingly. Note that we apply from top to bottom.
