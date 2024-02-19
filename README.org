@@ -5,11 +5,12 @@ The minor mode to run [[https://github.com/lassik/emacs-format-all-the-code][for
 simply add ~fmo-mode~ to your desired major mode or globally in ~prog-mode~.
 
 #+begin_src emacs-lisp
-(use-package fmo-mode
-  :vc (:fetcher github :repo "xeechou/fmo-mode.el")
-  :hook ((prog-mode . fmo-mode)
-         ;;fmo-mode requires give formatter to format-all to work.
- 	   (fmo-mode . format-all-ensure-formatter)))
+  (use-package fmo-mode
+    :vc (:fetcher github :repo "xeechou/fmo-mode.el")
+    :custom (fmo-ensure-formatters t)
+    :hook ((prog-mode . fmo-mode)
+           ;;fmo-mode requires give formatter to format-all to work.
+             (fmo-mode . format-all-ensure-formatter)))
 #+end_src
 
 
