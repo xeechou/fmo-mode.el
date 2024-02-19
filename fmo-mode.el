@@ -209,6 +209,14 @@ to format"
     )
   )
 
+(defun fmo-debug-format-region ()
+  (interactive)
+  (message (format "active region:(%d, %d)"
+		   (region-beginning)
+		   (region-end)))
+  (format-all-region (region-beginning) (region-end)))
+
+
 ;;;###autoload
 (define-minor-mode fmo-mode
   "Format cleanup at only modified lines"
