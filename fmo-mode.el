@@ -31,19 +31,26 @@
 
 (defgroup fmo nil
   "apply format-all-region at only at modified lines"
-  :group 'convenience)
+  :group 'fmo)
 
 (defconst fmo-hunk-header
   "^@@ -\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? \\+\\([0-9]+\\)\\(?:,\\([0-9]+\\)\\)? @@")
 
+(defvar fmo-hook nil "hook for fmo minor mode")
+
+(defcustom fmo-ensure-formatters nil
+  "when not-nil, adding format-all-ensure-formatters to the hook"
+  :type 'boolean
+  :group 'fmo)
+
 (defun fmo--hunk-get-change (header)
   "returns a cons (start-line . line-length) from a hunk header like
 @@ -38,6 +38,8 @@ if match the header, otherwise return nil"
-  (save-match-data ; is usually a good idea
-    (if (string-match fmo-hunk-header header)
-	(cons (string-to-number (match-string 3 header))
-	      (string-to-number (match-string 4 header)))
-      nil)))
+       (save-match-data			; is usually a good idea
+	 (if (string-match fmo-hunk-header header)
+	     (cons (string-to-number (match-string 3 header))
+		   (string-to-number (match-string 4 header)))
+	   nil)))
 
 ;; (fmo--hunk-get-change " @@ -102 +101,0 @@ ")
 
@@ -209,8 +216,9 @@ to format"
   :group 'fmo
   (if fmo-mode
       (progn
+	(when fmo-ensure-formatters (format-all-ensure-formatter))
 	(add-hook 'before-save-hook 'fmo-format-changed-lines t t))
     (progn
-      (remove-hook 'before-save-hook 'fmo-format-changed-lines t))))
-
+      (remove-hook 'before-save-hook 'fmo-format-changed-lines t)))
+  )
 (provide 'fmo-mode)
