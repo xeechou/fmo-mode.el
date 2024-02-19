@@ -9,7 +9,7 @@ simply add ~fmo-mode~ to your desired major mode or globally in ~prog-mode~.
   :vc (:fetcher github :repo "xeechou/fmo-mode.el")
   :hook ((prog-mode . fmo-mode)
          ;;fmo-mode requires give formatter to format-all to work.
- 	   (prog-mode . format-all-ensure-formatter)))
+ 	   (fmo-mode . format-all-ensure-formatter)))
 #+end_src
 
 
