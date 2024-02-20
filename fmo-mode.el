@@ -33,7 +33,7 @@
 (require 'format-all)
 
 (defgroup fmo nil
-  "Apply format-all-region at only at modified lines."
+  "Apply `format-all-region' at only at modified lines."
   :group 'fmo)
 
 (defconst fmo-hunk-header
@@ -170,7 +170,7 @@ Use n 0 to get precise diff."
 
 ;;;###autoload
 (defun fmo-format-changed-lines ()
-  "Run format-all-region on modified lines in current buffer."
+  "Run `format-all-region' on modified lines in current buffer."
   (interactive)
   (let ((lines-changed (fmo--buffer-get-diff-list-reversed))
 	(offset 0)) ;;initial offset is 0
@@ -181,7 +181,7 @@ Use n 0 to get precise diff."
 	(fmo-format-lines line-beg-end)))))
 
 (defun fmo-debug-format-changed ()
-  "Run fmo-format-changed-lines and print lines we need to format.
+  "Run `fmo-format-changed-lines' and print lines we need to format.
 
 Writes to *fmo-debug*"
   (interactive)
