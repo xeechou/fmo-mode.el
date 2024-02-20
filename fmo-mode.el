@@ -3,7 +3,7 @@
 ;; Author: Xichen Zhou <sichem.zh@gmail.com>
 ;; Copyright (C) 2023, Xichen Zhou, all rights reversed.
 ;; URL: https://github.com/xeechou/fmo-mode.el
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "29.1") (difflib "0.3.7") (format-all "0.5.0"))
 ;; Keywords: languages util
 
