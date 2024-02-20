@@ -38,7 +38,7 @@
 
 (defvar fmo-hook nil "hook for fmo minor mode")
 
-(defcustom fmo-ensure-formatters nil
+(defcustom fmo-ensure-formatters t
   "when not-nil, adding format-all-ensure-formatters to the hook"
   :type 'boolean
   :group 'fmo)
