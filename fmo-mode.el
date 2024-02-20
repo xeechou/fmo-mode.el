@@ -1,9 +1,10 @@
-;;; fmo-mode.el --- Format only changed lines.
+;;; fmo-mode.el --- Format only changed lines
 
 ;; Author: Xichen Zhou <sichem.zh@gmail.com>
 ;; Copyright (C) 2023, Xichen Zhou, all rights reversed.
+;; URL: https://github.com/xeechou/fmo-mode.el
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "24.4") (difflib "0.3.7") (format-all "0.5.0"))
+;; Package-Requires: ((emacs "29.1") (difflib "0.3.7") (format-all "0.5.0"))
 ;; Keywords: languages util
 
 ;; This file is not part of GNU Emacs.
@@ -115,9 +116,7 @@ Like @@ -38,6 +38,8 @@ if match the header, otherwise return nil."
 	  (fmo--pos-bol-at beg-line))
 	(if (>= end-line (fmo--buffer-last-line))
 	    (point-max)
-	  (fmo--pos-eol-at end-line)
-	  ))
-  )
+	  (fmo--pos-eol-at end-line))))
 ;; (fmo--lines-get-pos 1 10) (point-max)
 
 (defun fmo--get-offsetted-lines (beg-end offset)
@@ -144,8 +143,8 @@ Use n 0 to get precise diff."
        (s-split "\n" modified-buffer)
        :fromfile "orignal"
        :tofile   "modified"
-       :n 1)) ;;setting to 0 cause some errors
-    ))
+       ;;setting to 0 cause some errors
+       :n 1))))
 
 (defun fmo--buffer-get-diff-list-reversed ()
   "Return the diff hunk header as a list, in the reserved order.
@@ -179,11 +178,7 @@ Use n 0 to get precise diff."
     (dolist (hunk lines-changed)
       (let* ((line-beg-len (fmo--hunk-get-change hunk))
 	     (line-beg-end (fmo--hunk-to-beg-end line-beg-len)))
-	(fmo-format-lines line-beg-end)
-	)
-      )
-    )
-  )
+	(fmo-format-lines line-beg-end)))))
 
 (defun fmo-debug-format-changed ()
   "Run fmo-format-changed-lines and print lines we need to format.
@@ -201,12 +196,7 @@ Writes to *fmo-debug*"
 	    (insert (format "formatting lines (%d, %d)\n"
 			    (car line-beg-end)
 			    (cdr line-beg-end))))
-	  (fmo-format-lines line-beg-end)
-	  )
-	)
-      )
-    )
-  )
+	  (fmo-format-lines line-beg-end))))))
 
 (defun fmo-debug-format-region ()
   "Debugging function to print formatting region."
@@ -227,8 +217,7 @@ Writes to *fmo-debug*"
 	(when fmo-ensure-formatters (format-all-ensure-formatter))
 	(add-hook 'before-save-hook 'fmo-format-changed-lines t t))
     (progn
-      (remove-hook 'before-save-hook 'fmo-format-changed-lines t)))
-  )
+      (remove-hook 'before-save-hook 'fmo-format-changed-lines t))))
 
 (provide 'fmo-mode)
 
