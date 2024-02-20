@@ -38,7 +38,7 @@
 
 (defvar fmo-hook nil "hook for fmo minor mode")
 
-(defcustom fmo-ensure-formatters nil
+(defcustom fmo-ensure-formatters t
   "when not-nil, adding format-all-ensure-formatters to the hook"
   :type 'boolean
   :group 'fmo)
@@ -52,6 +52,11 @@
 		   (string-to-number (match-string 4 header)))
 	   nil)))
 
+(defun fmo--hunk-to-beg-end (hunk)
+  "convenience function to return beg-line end-line from beg-line + offset"
+  (let ((beg-line (car hunk))
+	(line-len (cdr hunk)))
+    (cons beg-line (+ beg-line line-len))))
 ;; (fmo--hunk-get-change " @@ -102 +101,0 @@ ")
 
 
@@ -93,15 +98,9 @@
     (fmo--goto-line ln)
     (pos-eol)))
 
-(defun fmo--pos-get-line (pos)
+(defun fmo--pos-to-line (pos)
   "return a line number given pos"
   (line-number-at-pos pos))
-
-(defun fmo--hunk-to-beg-end (hunk)
-  "convenience function to return beg-line end-line from beg-line + offset"
-  (let ((beg-line (car hunk))
-	(line-len (cdr hunk)))
-    (cons beg-line (+ beg-line line-len))))
 
 (defun fmo--lines-get-pos-region (beg-line end-line)
   "working on current buffer, get positions regions from line
@@ -116,15 +115,16 @@ region, returns a pair of position"
   )
 ;; (fmo--lines-get-pos 1 10) (point-max)
 
-(defun fmo--get-offset-lines (beg-end offset)
-  "getting the offset line region of current buffer"
+(defun fmo--get-offsetted-lines (beg-end offset)
+  "giving a cons of (beg . end) line set and a @offset in position, return the
+offset-ted (beg . end) set"
   (let* ((beg-line (car beg-end))
 	 (end-line (cdr beg-end))
 	 (pos-region (fmo--lines-get-pos-region beg-line end-line))
 	 (pos-beg (car pos-region))
 	 (pos-end (cdr pos-region)))
-    (cons (fmo--pos-get-line (+ offset pos-beg))
-	  (fmo--pos-get-line (+ offset pos-end)))))
+    (cons (fmo--pos-to-line (+ offset pos-beg))
+	  (fmo--pos-to-line (+ offset pos-end)))))
 
 ;;TODO rely on diff instead of difflib
 (defun fmo--buffer-diff-file ()
@@ -142,44 +142,38 @@ to get precise diff"
        :n 1)) ;;setting to 0 cause some errors
     ))
 
-(defun fmo--buffer-get-diff-list ()
-  "returns the diff hunk header as a list"
+(defun fmo--buffer-get-diff-list-reversed ()
+  "returns the diff hunk header as a list, in the reserved order. So when we
+   apply the formatter, we start from the bottom, there is no need to track the
+   change anymore"
   (let ((diff-res (fmo--buffer-diff-file))
 	(diffset (list)))
     (progn
       (dolist (line diff-res)
 	(when (and line (fmo--string-starts-with fmo-hunk-header line))
-	  (setq diffset (append diffset (list line)))))
+	  (add-to-list 'diffset line)))
       diffset)))
 
-;; (fmo--buffer-get-diff-list)
-
-
 (defun fmo-format-lines (beg-end)
-  "run formatter and return an offset after applying it"
-  (let* ((buffer-length (point-max))
-	 (beg-line (car beg-end))
+  "run formatter given lines of (begin . end)"
+  (let* ((beg-line (car beg-end))
 	 (end-line (cdr beg-end))
 	 (region (fmo--lines-get-pos-region beg-line end-line))
 	 (pos-beg (car region))
 	 (pos-end (cdr region)))
-    (progn
-      (format-all-region pos-beg pos-end)
-      (- buffer-length (point-max)))))
+    (format-all-region pos-beg pos-end)))
 
 ;;;###autoload
 (defun fmo-format-changed-lines ()
   "run format-all-region on modified lines in current buffer"
   (interactive)
-  (let ((lines-changed (fmo--buffer-get-diff-list))
+  (let ((lines-changed (fmo--buffer-get-diff-list-reversed))
 	(offset 0)) ;;initial offset is 0
 
     (dolist (hunk lines-changed)
       (let* ((line-beg-len (fmo--hunk-get-change hunk))
-	     (line-beg-end (fmo--hunk-to-beg-end line-beg-len))
-	     (offset-lines (fmo--get-offset-lines line-beg-end offset)))
-	(setq offset (+ offset
-			(fmo-format-lines offset-lines)))
+	     (line-beg-end (fmo--hunk-to-beg-end line-beg-len)))
+	(fmo-format-lines line-beg-end)
 	)
       )
     )
@@ -189,20 +183,18 @@ to get precise diff"
   "run fmo-format-changed-lines and insert into *scratch* on the lines we need
 to format"
   (interactive)
-  (let ((lines-changed (fmo--buffer-get-diff-list))
+  (let ((lines-changed (fmo--buffer-get-diff-list-reversed))
 	(offset 0)) ;;initial offset is 0
 
     (dolist (hunk lines-changed)
       (let* ((line-beg-len (fmo--hunk-get-change hunk))
-	     (line-beg-end (fmo--hunk-to-beg-end line-beg-len))
-	     (offset-lines (fmo--get-offset-lines line-beg-end offset)))
+	     (line-beg-end (fmo--hunk-to-beg-end line-beg-len)))
 	(progn
-	  (with-current-buffer "*scratch*"
+	  (with-current-buffer "*fmo-debug*"
 	    (insert (format "formatting lines (%d, %d)\n"
-			    (car offset-lines)
-			    (cdr offset-lines))))
-	  (setq offset (+ offset
-			  (fmo-format-lines offset-lines)))
+			    (car line-beg-end)
+			    (cdr line-beg-end))))
+	  (fmo-format-lines line-beg-end)
 	  )
 	)
       )
