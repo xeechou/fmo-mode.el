@@ -3,7 +3,7 @@
 ;; Author: Xichen Zhou <sichem.zh@gmail.com>
 ;; Copyright (C) 2023, Xichen Zhou, all rights reversed.
 ;; URL: https://github.com/xeechou/fmo-mode.el
-;; Version: 0.1.1
+;; Version: 0.1.2
 ;; Package-Requires: ((emacs "29.1") (difflib "0.3.7") (format-all "0.5.0"))
 ;; Keywords: languages util
 
@@ -66,9 +66,9 @@ Like @@ -38,6 +38,8 @@ if match the header, otherwise return nil."
 
 (defun fmo-print-lines (beg end)
   "Printing line information giving (BEG END) position."
-  (message (format "changed lines (%d %d)"
-		   (line-number-at-pos beg)
-		   (line-number-at-pos end))))
+  (message "changed lines (%d %d)"
+	   (line-number-at-pos beg)
+	   (line-number-at-pos end)))
 
 (defun fmo--buffer-content-simple ()
   "Get current buffer content as a string."
@@ -92,13 +92,13 @@ Like @@ -38,6 +38,8 @@ if match the header, otherwise return nil."
   (forward-line (1- ln)))
 
 (defun fmo--pos-bol-at (ln)
-  "Goto line at LN and return \"pos-bol\"."
+  "Goto LN and return `pos-bol'."
   (save-excursion
     (fmo--goto-line ln)
     (pos-bol)))
 
 (defun fmo--pos-eol-at (ln)
-  "Goto line at LN and return \"pos-eol\"."
+  "Goto LN and return `pos-bol'."
   (save-excursion
     (fmo--goto-line ln)
     (pos-eol)))
@@ -201,9 +201,9 @@ Writes to *fmo-debug*"
 (defun fmo-debug-format-region ()
   "Debugging function to print formatting region."
   (interactive)
-  (message (format "active region:(%d, %d)"
-		   (region-beginning)
-		   (region-end)))
+  (message "active region:(%d, %d)"
+	   (region-beginning)
+	   (region-end))
   (format-all-region (region-beginning) (region-end)))
 
 
@@ -215,9 +215,8 @@ Writes to *fmo-debug*"
   (if fmo-mode
       (progn
 	(when fmo-ensure-formatters (format-all-ensure-formatter))
-	(add-hook 'before-save-hook 'fmo-format-changed-lines t t))
-    (progn
-      (remove-hook 'before-save-hook 'fmo-format-changed-lines t))))
+	(add-hook 'before-save-hook #'fmo-format-changed-lines t t))
+    (remove-hook 'before-save-hook #'fmo-format-changed-lines t)))
 
 (provide 'fmo-mode)
 
