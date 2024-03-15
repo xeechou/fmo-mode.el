@@ -1,9 +1,16 @@
-* fmo-mode.el
+#+title: fmo-mode.el - Format modified only mode
+#+author: Xichen (Sichem) Zhou
+#+language: en
+
+#+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
+#+html:     <a href="https://melpa.org/#/fmo-mode"><img alt="MELPA" src="https://melpa.org/packages/fmo-mode-badge.svg"/></a>
+
 The minor mode to run [[https://github.com/lassik/emacs-format-all-the-code][format-all]] only on changed lines instead of whole buffer, this is convenient for large legacy code base that have not conform to formatter yet.
 
-* Usage
-simply add ~fmo-mode~ to your desired major mode or globally in ~prog-mode~.
+* Installing
+fmo-mode can be installed directly through [[https://melpa.org/#/fmo-mode][MELPA]] via the Emacs built-in package manager. Alternatively, it can also be installed from the development repository.
 
+Here is an example:
 #+begin_src emacs-lisp
   (use-package fmo-mode
     :vc (:fetcher github :repo "xeechou/fmo-mode.el")
@@ -13,12 +20,16 @@ simply add ~fmo-mode~ to your desired major mode or globally in ~prog-mode~.
              (fmo-mode . format-all-ensure-formatter)))
 #+end_src
 
+Note that
+
+* Customization
+- ~fmo-ensure-formatters~ : an alias to ~format-all-ensure-formatter~, default to ~t~. For setting custom formatters, please refer to settings in [[https://github.com/lassik/emacs-format-all-the-code?tab=readme-ov-file#how-to-customize][format-all]]. Note that ~fmo-mode~ relies on ~format-all-region~, ensure your formatter can work with this function.
 
 * How it works
 it relies on [[https://www.gnu.org/software/diffutils/manual/html_node/Hunks.html][Diff Hunks]] to track the changed region of the file, we get a list of change regions. Then we iterative-ly apply ~format-all-region~ on the hunks while *maintaining* a ~offset~, this offset tracks the size of changes of ~format-all-region~ for each iteration. Then we shift the _hunk_ accordingly. Note that we apply from top to bottom.
 
 * TODO Next steps
-- [ ] I think it is probably easier if we apply ~fmo-format-lines~ bottom-up, that we do not even need to keep track of the ~offset~ anymore.
+- [X] I It is easier if we apply ~fmo-format-lines~ bottom-up, that we do not even need to keep track of the ~offset~ anymore.
 - [ ] resort to use diff directly referring [[https://emacs.stackexchange.com/questions/27382/diff-of-two-buffers-without-creating-temporary-files][this-article]].
 
 * License
